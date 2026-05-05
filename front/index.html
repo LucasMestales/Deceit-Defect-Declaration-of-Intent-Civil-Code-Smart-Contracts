@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DeceptiveVault — Web3 Security Simulation | Synxius</title>
+    <meta
+      name="description"
+      content="Educational Web3 security simulation demonstrating smart contract UI deception on Ethereum Sepolia testnet. No real funds are used. Research project on blockchain security and legal aspects of intent defects."
+    />
+    <meta
+      property="og:title"
+      content="DeceptiveVault — Web3 Security Simulation"
+    />
+    <meta
+      property="og:description"
+      content="Educational simulation of smart contract UI deception on Ethereum Sepolia testnet."
+    />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="styles.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script
+      src="https://cdn.jsdelivr.net/npm/ethers@6.16.0/dist/ethers.umd.min.js"
+      integrity="sha256-moWlqoEwX4XmVGRS/SCTqKaJMr7TzsT2SR5NAxqQvJU="
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/chart.js"
+      integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div class="edu-banner">
+      ⚠ Educational Simulation — Sepolia Testnet Only — No real funds are used
+    </div>
+    <nav class="navbar">
+      <div class="nav-left">
+        <a href="https://synxius.com" class="logo">
+          <img src="logoSynx.svg" alt="Wallet icon" class="icon-e" />
+
+          <span>Synxius.com</span>
+        </a>
+
+        <div class="nav-links" id="nav-links">
+          <a
+            href="https://mestales.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >User</a
+          >
+          <a
+            href="https://synxius.com/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >Platform</a
+          >
+          <a href="#" class="active">Earn</a>
+        </div>
+      </div>
+
+      <div class="nav-right">
+        <button class="btn-outline tip-btn" data-tip="login">Login</button>
+        <button class="btn-outline tip-btn" data-tip="register">
+          Register
+        </button>
+        <button class="btn-outline tip-btn" data-tip="wallet">
+          Connect Wallet
+        </button>
+        <a href="https://metamask.io/" class="logo">
+          <img src="MetaMask-logo.svg" alt="Wallet icon" class="icon-m" />
+        </a>
+
+        <div id="cyberTipModal" class="cyber-modal" aria-hidden="true">
+          <div class="cyber-modal__backdrop" data-close></div>
+
+          <div
+            class="cyber-modal__card"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="cyberTipTitle"
+          >
+            <button
+              class="cyber-modal__close"
+              type="button"
+              data-close
+              aria-label="Zamknij"
+            >
+              ×
+            </button>
+            <div class="cyber-modal__eyebrow">Cybersecurity tip</div>
+            <p id="cyberTipText" class="cyber-modal__text"></p>
+          </div>
+        </div>
+
+        <button class="nav-toggle" id="nav-toggle" aria-label="Otwórz menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </nav>
+
+    <main class="container">
+      <div class="hero-split">
+        <div class="hero-left">
+          <div class="laptop-mockup">
+            <img
+              src="laptop.png"
+              alt="Platforma handlowa"
+              class="laptop-image"
+            />
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <div class="dashboard-grid vertical-stack">
+            <div class="hero-text">
+              <h1>Earn money from your assets.</h1>
+              <p>
+                Deposit crypto in the Earn program and earn up to 14.5%
+                annually. Safely and with no hidden fees.
+              </p>
+            </div>
+            <div class="exchange-widget">
+              <div id="setup-section" class="widget-section">
+                <div class="icon-wrapper">
+                  <img src="etherum.svg" alt="Wallet icon" class="icon-e" />
+                </div>
+                <h2>Web3 Authorization</h2>
+                <p>
+                  Connect your wallet to access your secure Vault Earn vault.
+                </p>
+                <button id="connect-wallet-main" class="btn-primary mt-20">
+                  Connect with MetaMask
+                  <img
+                    src="MetaMask-icon-fox.svg"
+                    alt="Wallet icon"
+                    class="icon-fox"
+                  />
+                </button>
+              </div>
+
+              <div id="vault-section" class="widget-section hidden">
+                <div class="widget-header">
+                  <h3>Deposit ETH</h3>
+                  <span id="user-address" class="address-badge">0x...</span>
+                </div>
+
+                <div class="chart-shell">
+                  <div class="chart-glass">
+                    <div class="chart-header">
+                      <div class="header-left">
+                        <span class="eyebrow">Funds performance</span>
+                        <h3>24h APY trend</h3>
+                      </div>
+
+                      <div class="header-right">
+                        <span class="price-up">+5.24% ↑</span>
+                        <span class="subtext">vs. yesterday</span>
+                      </div>
+                    </div>
+
+                    <div class="chart-body">
+                      <canvas id="yieldChart"></canvas>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="input-container">
+                  <div class="input-header"><label>Deposit amount</label></div>
+                  <div class="input-box">
+                    <input
+                      type="number"
+                      id="deposit-amount"
+                      value="0.01"
+                      step="0.01"
+                    />
+                    <div class="currency-badge">
+                      <div class="eth-icon"></div>
+                      ETH
+                    </div>
+                  </div>
+                  <div class="fiat-estimate">≈ $3,450.00</div>
+                </div>
+
+                <div class="actions">
+                  <button id="btn-promo" class="btn-primary">
+                    <div class="btn-flex">
+                      <span>Deposit to Vault Earn</span>
+                      <span class="badge-free">No fees</span>
+                    </div>
+                  </button>
+                  <button id="btn-standard" class="btn-secondary">
+                    Regular Transfer
+                    <span class="commision">(5.5% Commission)</span>
+                  </button>
+                </div>
+
+                <div id="status-container" class="hidden">
+                  <div class="loader"></div>
+                  <span id="status" class="status-msg"
+                    >Waiting for network...</span
+                  >
+                </div>
+              </div>
+            </div>
+
+            <aside
+              id="balance-box"
+              class="glass-panel balance-box hidden"
+              style="min-width: unset"
+            >
+              <h4 id="report-title">Operations Audit</h4>
+              <div id="verdict-badge" class="verdict-normal">
+                STATUS: Waiting
+              </div>
+
+              <div class="audit-grid">
+                <div class="balance-row">
+                  <span>Before:</span> <span id="wallet-before">-</span>
+                </div>
+                <div class="balance-row">
+                  <span>After:</span> <span id="wallet-after">-</span>
+                </div>
+                <div class="balance-row">
+                  <span>In Vault:</span>
+                  <span id="vault-physical-balance">-</span>
+                </div>
+                <hr />
+                <div class="balance-row">
+                  <span>Payment:</span> <span id="audit-amount">-</span>
+                </div>
+                <div class="balance-row">
+                  <span>Provision in the contract:</span>
+                  <span id="vault-internal-balance">-</span>
+                </div>
+                <div class="balance-row">
+                  <span>The perpetrator's profit:</span>
+                  <span id="attacker-gain">-</span>
+                </div>
+                <div class="balance-row">
+                  <span>The perpetrator's sum:</span>
+                  <span id="attacker-balance">-</span>
+                </div>
+              </div>
+
+              <div id="legal-comment" class="legal-box">...</div>
+            </aside>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="crypto-marquee">
+      <div class="crypto-marquee__border">
+        <div class="crypto-marquee__bg">
+          <div class="crypto-marquee__track" id="cryptoTrack">
+            <div class="crypto-pill">
+              <span class="dot up"></span>
+              <strong>BTC</strong>
+              <span>$68,421</span>
+              <span class="chg up">+2.41%</span>
+            </div>
+            <div class="crypto-pill">
+              <span class="dot up"></span>
+              <strong>ETH</strong>
+              <span>$3,612</span>
+              <span class="chg up">+1.18%</span>
+            </div>
+            <div class="crypto-pill">
+              <span class="dot down"></span>
+              <strong>SOL</strong>
+              <span>$142.88</span>
+              <span class="chg down">-0.64%</span>
+            </div>
+            <div class="crypto-pill">
+              <span class="dot up"></span>
+              <strong>BNB</strong>
+              <span>$587.90</span>
+              <span class="chg up">+0.83%</span>
+            </div>
+            <div class="crypto-pill">
+              <span class="dot up"></span>
+              <strong>XRP</strong>
+              <span>$0.61</span>
+              <span class="chg up">+3.02%</span>
+            </div>
+            <div class="crypto-pill">
+              <span class="dot down"></span>
+              <strong>AVAX</strong>
+              <span>$36.44</span>
+              <span class="chg down">-1.14%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="premium-footer">
+      <div class="premium-footer__top">
+        <div class="premium-footer__brand">
+          <div class="footer-brand-row">
+            <strong>Synxius</strong>
+            <a
+              href="https://synxius.com"
+              target="_blank"
+              class="footer-brand-link"
+              >synxius.com</a
+            >
+          </div>
+
+          <p>
+            A modern crypto platform and Web3 tools built with a focus on
+            security, simplicity, and premium design.
+          </p>
+
+          <div class="premium-footer__badges">
+            <span>WEB3</span>
+            <span>SECURE</span>
+            <span>ETHERUM</span>
+          </div>
+        </div>
+
+        <div class="premium-footer__columns">
+          <div class="premium-footer__col">
+            <h3>Contact</h3>
+            <a href="https://mestales.com" target="_blank">mestales.com</a>
+            <a href="mailto:l@mestales">l@mestales</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-footer__bottom">
+        <span>2026 Synxius. Built by Łukasz Mestales.</span>
+
+        <div class="premium-footer__bottom-links">
+          <a href="https://www.linkedin.com/in/%C5%82ukasz-mestales-8b41283b9/"
+            >LinkedIn</a
+          >
+          <a href="https://github.com/LucasMestales">GitHub</a>
+        </div>
+      </div>
+      <div class="premium-footer__disclaimer">
+        <div class="disclaimer-icon">⚠</div>
+
+        <p>
+          <strong>Disclaimer:</strong> This simulation was prepared for
+          scientific and educational purposes only. Under no circumstances
+          should real cryptocurrencies with real market value be used. The
+          application is designed to work
+          <strong>only on the Sepolia test network</strong>. The author is not
+          responsible for any loss of funds resulting from incorrect use of the
+          tool.
+        </p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
